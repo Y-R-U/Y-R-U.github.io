@@ -25,7 +25,7 @@ export const T = {
   committedGs: { jumbo: 5, herc: 8, f35: 8, dash8: 8, a320: 6 },   // m/s: past this on the takeoff roll a cleared jet is not cancelled
   spacingPlayer: 65,               // behind a human (who knows)
   minFinalGap: 22,                 // seconds; on final with less than this behind the leader = go around
-  spacingGaDist: { dash8: 2500, a320: 2500 },   // AIRLINERS: ...once inside this (an airliner sent round 9 km out on its long final went straight back onto it)
+  spacingGaDist: { dash8: 2500, a320: 2500, jumbo: 2500, herc: 2500, f35: 2500, bizjet: 2500 },   // AIRLINERS/FLIGHTFIX8: jets only once inside this (one sent round 9 km out on its long final went straight back onto it)
   maxExtend: 5000,
   rwChangeMax: 180,                // s a runway change waits for the old runway to go quiet
   clearLandDist: 2600,             // landing clearance offered inside this remaining distance

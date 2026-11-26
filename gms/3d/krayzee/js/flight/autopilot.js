@@ -960,11 +960,13 @@ export class Autopilot {
       this._setPhase('GO AROUND');
       // jets sidestep 300 m toward the circuit side: a heavy going round must not climb straight up a departure's back
       // FLIGHTFIX7: sent round for traffic landing the other way: break off to the circuit side, never up the runway at it
-      const side = !e.virtual ? (circuitSide(e.id) === 'left' ? -1 : 1) : 0, opp = /other way/.test(this._gaWhy || '') && !FALSIFY.oppGA;
+      // FLIGHTFIX8: so is any go-around with traffic coming the other way ahead (a DEMAND TAKEOFF on the reciprocal)
+      if (!e.virtual && ac.time >= (this._hoT ?? -1)) { this._hoT = ac.time + 0.5; this._gaHead ||= this._headOnAhead(e); }
+      const side = !e.virtual ? (circuitSide(e.id) === 'left' ? -1 : 1) : 0, opp = (/other way/.test(this._gaWhy || '') && !FALSIFY.oppGA) || (this._gaHead && !FALSIFY.headGA);
       const [fx, fz] = fromRunway(e, p.s + 800, opp ? side * 900 : P.jet && !e.virtual ? side * 300 : 0);
       t.air = true; t.thr = 1; t.flaps = ac.agl > 60 ? 0 : 1 / 3; t.speed = P.vy; t.vs = 5;
       if (P.jet) { t.speed = Math.max(P.vapp, Math.min(P.vy, ac.speed + 3)); t.vs = ac.agl < 30 ? 3 : 6; }   // spooling up: climb, never dive for speed
-      t.bank = this._bankFor(bearing(ac.pos.x, ac.pos.z, fx, fz), P.jet && ac.agl < 40 ? 4 : opp && ac.agl > 40 ? 30 : 15);   // a jumbo's outboard pods touch at ~9° of bank
+      t.bank = this._bankFor(bearing(ac.pos.x, ac.pos.z, fx, fz), P.jet && ac.agl < 40 ? 4 : opp && ac.agl > (this._gaHead ? 20 : 40) ? 30 : 15);   // a jumbo's outboard pods touch at ~9° of bank
       if (this.landing && ac.agl > 50) { this._landCircuit(e); return this._fly(t, this.leg); }
       if (ac.agl > (P.jet ? 220 : 140)) { this._ignoreLand = e.id; this._ignoreUntil = ac.time + 40; this.replan(); }
       return;
@@ -1084,6 +1086,11 @@ export class Autopilot {
     if (this.landing && ac.mainsDown && ac.vel.y < 1) { this.sub = 'rollout'; this.cur.k = 0; return; }   // already down short of the aim point: stay down
     if (this.landing && ac.time - (ac.lastTouchdown?.t ?? -9) < 3 && ac.agl < 15) { this.sub = 'flare'; this.iPitch = 0; return; }   // bounced: settle it back down
     if (this._jetTrafficAhead(e, d) && !this.overridden && !this._landDown) return this._goAround('traffic ahead');
+    // FLIGHTFIX8: an AI on final with a departure rolling / climbing at it on the reciprocal goes round early, off to the side
+    if (!this.isPlayer && !this.overridden && !e.virtual && d < 3500 && d > 0 && !FALSIFY.headGA && ac.time >= (this._hoT ?? -1)) {
+      this._hoT = ac.time + 0.5;
+      if (this._headOnAhead(e)) return this._goAround('traffic coming the other way');
+    }
     if (this.overridden || (this.landing && this._landDown)) return;
     const hi = ac.alt - gpAlt;
     if (d < 450 && ((Math.abs(p.l) > (this.landing ? 45 : 35) && d < (this.landing ? 150 : 450) && !(this.landing && ac.agl < 5)) || hi > (this.landing && e.len > 900 ? 80 : 45))) return this._goAround(Math.abs(p.l) > 35 ? 'not lined up' : 'too high');   // LAND on a long runway: land long rather than go round
@@ -1187,8 +1194,25 @@ export class Autopilot {
     if (this.landing && /^Tower/.test(reason) && this.cur?.e && !this._touchdownZoneBusy(this.cur.e)) { this._emit('goaroundrefused', { reason }); return; }
     if (this.landing) this._landGAs = (this._landGAs || 0) + (/occupied/.test(reason) ? 2 : 1);   // occupied: land long next time round
     this.tgo = false;
-    this.sub = 'goaround'; this._gaWhy = reason;
+    this.sub = 'goaround'; this._gaWhy = reason; this._gaHead = false;
     this._emit('goaround', { reason });
+  }
+
+  // traffic coming the other way down our runway: rolling at us on it, or airborne on a collision course (closest approach
+  // in the next 40 s inside 150 m, 60 m vertically) while heading within 40° of the reciprocal
+  _headOnAhead(e) {
+    const ac = this.ac, me = toRunway(e, ac.pos.x, ac.pos.z);
+    return (this.traffic?.list || []).some((o) => {
+      const b = o.ac;
+      if (b === ac || b.crashed) return false;
+      const p = toRunway(e, b.pos.x, b.pos.z), along = b.vel.x * e.u[0] + b.vel.z * e.u[1];
+      if (p.s < me.s - 50 || p.s > me.s + 4000 || along > -0.77 * Math.max(b.gs, 1) || b.gs < 12) return false;
+      if (b.onGround) return Math.abs(p.l) < (e.width || 30) / 2 + 10;
+      const dx = b.pos.x - ac.pos.x, dy = b.pos.y - ac.pos.y, dz = b.pos.z - ac.pos.z;
+      const rx = b.vel.x - ac.vel.x, ry = b.vel.y - ac.vel.y, rz = b.vel.z - ac.vel.z, r2 = rx * rx + rz * rz || 1;
+      const tc = clamp(-(dx * rx + dz * rz) / r2, 0, 40);
+      return Math.hypot(dx + rx * tc, dz + rz * tc) < 150 && Math.abs(dy + ry * tc) < 60;
+    });
   }
 
   _bankFor(hdg, maxBankDeg) {
@@ -1258,6 +1282,13 @@ export class Autopilot {
     if (best >= 0) { this.i = best; this.override = null; this._begin(true); this._emit('replan', { to: 'fly', leg: best }); return; }
     // no flying legs in this route (eg. a taxi route): land on the most convenient runway
     const ai = legs.findIndex((l) => l.kind === 'approach');
+    // FLIGHTFIX8: an arrival spawned on final has no flying legs: after a go-around it flies the circuit, not the same final at once
+    const ign = ai >= 0 && !FALSIFY.gaLoop && this._ignoreLand === (this.override?.end ?? legs[ai].end) && ac.time < this._ignoreUntil;
+    if (ign) {
+      const circ = circuitLegs(this._ignoreLand, this.route.circ || { type: ac.type }).slice(2);
+      this.route = { ...this.route, legs: [...legs.slice(0, ai), ...circ, ...legs.slice(ai)] };
+      this.i = ai; this.override = null; this._begin(true); this._emit('replan', { to: 'fly', leg: ai }); return;
+    }
     if (ai >= 0) { this.i = ai; this._begin(true); return; }
     const e = allRunwayEnds().sort((p, q) => Math.abs(wrap180(p.hdg - ac.track)) - Math.abs(wrap180(q.hdg - ac.track)))[0];
     this.route = { name: 'divert', legs: [...circuitLegs(e.id, this.route.circ || { type: ac.type }).slice(2), { kind: 'approach', end: e.id, label: 'FINAL', ...(this._circ().faf ? { fafDist: this._circ().faf } : {}) }, { kind: 'taxi', dest: { stand: 'auto' }, label: 'TAXI IN' }, { kind: 'park', seconds: 30 }], loop: null };

@@ -7,6 +7,7 @@ import { PROTECTION } from '../../data/rules.js';
 
 export const AXES = ['aileron', 'elevator', 'rudder', 'throttle', 'flaps', 'brake'];
 export const OVERRIDE = { deadzone: 0.08, wait: 1.5, blend: 2.0 };
+export const FALSIFY_TR = {};
 // Wake turbulence (arcade, survivable): per roster `wake` class. str = peak roll acceleration (rad/s²) at the core,
 // r = core radius (m), life = seconds a vortex lasts (sinking SINK m/s). Only planes under half the source's mass feel it.
 export const WAKE = { super: { str: 7, r: 45, life: 70 }, heavy: { str: 4, r: 32, life: 50 }, medium: { str: 1.8, r: 18, life: 30 }, SINK: 0.6, band: [-30, 30], every: 0.5 };
@@ -158,7 +159,8 @@ export class Traffic {
         if (ac.onGround && st.val <= 0.05 && apOut && !off) { st.mode = 'blend'; st.from = st.val; st.dur = OVERRIDE.blend; }
       } else if (st.mode === 'wait') {
         st.t += h;
-        if (st.t >= (stickAxes.includes(k) ? stickWait : OVERRIDE.wait) || (urgent && k !== 'throttle')) { st.mode = 'blend'; st.t = 0; st.from = k !== 'throttle' && apOut && !ac.onGround ? apOut[k] : st.val; st.dur = urgent ? 0.25 : OVERRIDE.blend; replan = true; }
+        // FLIGHTFIX8: an upset met during the countdown is a recovery too (it took back silently, no RECOVERING flash)
+        if (st.t >= (stickAxes.includes(k) ? stickWait : OVERRIDE.wait) || (urgent && k !== 'throttle')) { st.mode = 'blend'; st.t = 0; st.from = k !== 'throttle' && apOut && !ac.onGround ? apOut[k] : st.val; st.dur = urgent ? 0.25 : OVERRIDE.blend; replan = true; if (urgent && k !== 'throttle' && !FALSIFY_TR.waitRecover) recover = true; }
       } else if (st.mode === 'blend') {
         st.t += h;
         if (st.t >= (st.dur || OVERRIDE.blend)) st.mode = 'auto';

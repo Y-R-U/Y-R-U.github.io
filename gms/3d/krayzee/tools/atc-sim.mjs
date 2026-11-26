@@ -12,6 +12,7 @@ import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 
 const args = Object.fromEntries(process.argv.slice(2).map((a) => { const [k, v] = a.replace(/^--/, '').split('='); return [k, v ?? true]; }));
+if (typeof args['falsify-ap'] === 'string') { const { FALSIFY } = await import('../js/flight/autopilot.js'); for (const k of args['falsify-ap'].split(',')) FALSIFY[k] = true; }
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 if (args.falsify) { falsify(); process.exit(0); }
 const { createATC, geometry: Gm } = await import(args.atc ? pathToFileURL(path.join(args.atc, 'js/atc/index.js')).href : '../js/atc/index.js');
@@ -1141,6 +1142,41 @@ async function headOn() {
   check(`LAND onto the reciprocal (09) with AI landing / waiting / departing 27 head-on (${rows.length}): no contact, nobody airborne within 90 m + half span`, !bad.length, (bad.length ? bad : rows).map((r) => r.d).join(' | '));
 }
 
+// FLIGHTFIX8 (loop jumbo-hard field LAND: "mid-air collision with K-PLUM"): the player DEMANDs a takeoff on 09 while an AI
+// lands 27. ATC sends the AI round ('runway occupied' / 'traffic'), and its go-around climbed straight up the runway into the
+// departing jet. Head-on traffic ahead on a go-around = break off to the circuit side, whatever the tower's reason.
+async function headOnDep() {
+  const { Aircraft, Autopilot } = await flightLib();
+  if (typeof args['falsify-ap'] === 'string') { const { FALSIFY } = await import('../js/flight/autopilot.js'); for (const k of args['falsify-ap'].split(',')) FALSIFY[k] = true; }
+  const rows = [];
+  const types = typeof args.jets === 'string' ? args.jets.split(',') : ['jumbo', 'herc', 'f35', 'c172'];
+  for (const type of types) for (const ad of [1200, 1800, 2500, 3200, 4000]) for (const ai_t of ['c172', 'tiger']) {
+    const W = await seqWorld(7);
+    const ai = W.spawn('final', { dist: ad, type: ai_t });
+    const e9 = R0().runwayEnd('09'), [px, pz] = R0().fromRunway(e9, 12, 0);
+    const ac = new Aircraft({ type });
+    ac.place({ x: px, z: pz, heading: e9.hdg }, W.env);
+    const P = W.tr.add({ aircraft: ac, ap: new Autopilot(ac), player: true, name: 'player' });
+    P.ap.setRoute(R0().circuitRoute('27', { type })); W.link.placed(P, 1);
+    W.step(0.5);
+    const end = W.link.demandTakeoff(P);
+    let minD = 1e9, hit = null, gaA = 0, why = '', climbed = false;
+    W.step(120, () => {
+      for (const ev of ac.events.splice(0)) if (ev.type === 'collision' || ev.type === 'crash') hit ??= `${ev.type} ${ev.reason || ev.other || ''} @${W.t.toFixed(0)}`;
+      for (const ev of ai.ap.events.splice(0)) { if (ev.type === 'goaround') { gaA++; why ||= ev.reason || ''; } if (args.dbgev && gaA < 8) console.log(`   ev t${W.t.toFixed(1)} ${JSON.stringify(ev).slice(0, 120)} sub ${ai.ap.sub} leg ${ai.ap.leg?.kind} agl ${ai.ac.agl.toFixed(0)}`); }
+      // the climb-out (to 200 m AGL) is the head-on; the circuits after it only have to stay contact-free
+      if (!ai.ac.crashed && !(ai.ac.onGround && ac.onGround) && !(climbed ||= ac.agl > 200)) minD = Math.min(minD, Math.hypot(ai.ac.pos.x - ac.pos.x, ai.ac.pos.y - ac.pos.y, ai.ac.pos.z - ac.pos.z));
+      if (args.dbghd && Math.round(W.t * 60) % 60 === 0) console.log(`   t${W.t.toFixed(0)} P ${ac.pos.x.toFixed(0)},${ac.pos.z.toFixed(0)},${ac.pos.y.toFixed(0)} ${ac.gs.toFixed(0)} | AI ${ai.ac.pos.x.toFixed(0)},${ai.ac.pos.z.toFixed(0)},${ai.ac.pos.y.toFixed(0)} ${ai.ap.phase} ${ai.ap._gaHead ? 'HEAD' : ''}`);
+      return !!hit;
+    });
+    const ok = !hit && minD > (ac.P.jet ? 90 : 50) + ac.dims.span / 2 && gaA <= 3;   // and no go-around loop back onto the same final
+    rows.push({ ok, d: `${type} on ${end} vs ${ai_t} final ${ad}: ${hit || `closest ${minD.toFixed(0)} m`}, AI ${ai.ap.phase} GA ${gaA}${why ? ` (${why})` : ''}` });
+  }
+  if (args.dbgjet) for (const r of rows) console.log('  HD', r.ok ? 'ok  ' : 'FAIL', r.d);
+  const bad = rows.filter((r) => !r.ok);
+  check(`DEMAND TAKEOFF on the reciprocal (09) with AI on final for 27 (${rows.length}): no contact in 120 s, nobody within 90 m (jets) / 50 m + half span on the climb-out, AI ≤ 3 go-arounds`, !bad.length, (bad.length ? bad : rows.slice(0, 4)).map((r) => r.d).join(' | '));
+}
+
 // FLIGHTFIX7 (loop f35: "AP took back after 5.1 s" / "throttle latched: not within 3 s"): an F-35 7.1 km out, fast and
 // heading out, is inside the boundary's rearm ring but predicted past the turn line: the escort's turnback and clear
 // alternated every frame. One turnback, held until it points home.
@@ -1325,14 +1361,20 @@ async function airliners() {
     check('airliners: an A320 is cleared behind a Bathtub departure only once it is past the far end + 900 m or 600 m off the centreline', !!ok && !bad(W).length,
       at ? `bathtub ${at.a.toFixed(0)} m down the runway axis, ${at.c.toFixed(0)} m off it, airborne ${at.air} (runway ${e27.len} m); ${bad(W).map((e) => e.type).join(', ') || 'no infractions'}` : 'A320 never rolled');
   }
+  // FLIGHTFIX8: every jet, not only the airliners (a Jumbo/Herc sent round ~9 km out rejoined the same final at once)
   {
-    const W = world();
-    const cub = W.add('cub', 'final', { dist: 3000 }), jet = W.add('a320', 'final', { dist: 8000 });
-    const ga = () => W.ins.filter((i) => i.cmd.type === 'goAround' && i.to === W.link.idOf(jet)).map((i) => Math.round(R.toRunway(R.runwayEnd('27'), jet.ac.pos.x, jet.ac.pos.z).s));
-    let gaAt = null;
-    W.step(500, () => { if (gaAt == null && ga().length) gaAt = ga()[0]; return jet.ac.onGround && jet.ac.speed < 20; });
-    check('airliners: no spacing go-around for an A320 on a long final until inside 2.5 km; lands or goes round, no infractions', (gaAt == null || gaAt > -TT.spacingGaDist.a320 - 100) && !bad(W).length,
-      `go-around ${gaAt == null ? 'none' : 'at ' + gaAt + ' m'}; landed ${jet.ac.onGround}; ${bad(W).map((e) => `${e.type}:${e.actor}`).join(', ') || 'no infractions'}`);
+    const rows = [];
+    for (const type of typeof args.jets === 'string' ? args.jets.split(',') : ['a320', 'dash8', 'jumbo', 'herc', 'f35', 'bizjet']) {
+      const W = world();
+      const cub = W.add('cub', 'final', { dist: 3000 }), jet = W.add(type, 'final', { dist: 8000 });
+      void cub;
+      const ga = () => W.ins.filter((i) => i.cmd.type === 'goAround' && i.to === W.link.idOf(jet)).map((i) => Math.round(R.toRunway(R.runwayEnd('27'), jet.ac.pos.x, jet.ac.pos.z).s));
+      let gaAt = null;
+      W.step(500, () => { if (gaAt == null && ga().length) gaAt = ga()[0]; return jet.ac.onGround && jet.ac.speed < 20; });
+      const lim = TT.spacingGaDist[type] ?? Infinity;
+      rows.push({ ok: (gaAt == null || gaAt > -Math.min(lim, 2500) - 100) && !bad(W).length, d: `${type}: go-around ${gaAt == null ? 'none' : 'at ' + gaAt + ' m'}; landed ${jet.ac.onGround}; ${bad(W).map((e) => `${e.type}:${e.actor}`).join(', ') || 'no infractions'}` });
+    }
+    check('airliners: no spacing go-around for a jet (A320/Jumbo/Herc/F-35/Learjet) on a long final until inside 2.5 km; lands or goes round, no infractions', rows.every((r) => r.ok), rows.map((r) => r.d).join(' | '));
   }
 }
 
@@ -1343,7 +1385,7 @@ if (!XF) { SCEN.flightcut = flightCutIn; SCEN.gameplay = gameplay; SCEN.avoid = 
 SCEN.flight = flightSoak;
 // after the soaks: aircraft ids are global, and the soaks' see-and-avoid tie-breaks (higher id gives way) depend on them
 if (!XF) Object.assign(SCEN, { landseq: landSeq, placed: placedLineUp, closedx: closedCrossing, uturn, refusedga: refusedGA, jetland: jetLand });   // jetland last: it adds planes (global ids)
-if (!XF) Object.assign(SCEN, { farmland: farmLand, headon: headOn, edgeflap: edgeFlap, airliners });
+if (!XF) Object.assign(SCEN, { farmland: farmLand, headon: headOn, headondep: headOnDep, edgeflap: edgeFlap, airliners });
 for (const [name, fn] of Object.entries(SCEN)) {
   if (args.only && args.only !== name) continue;
   const t0 = Date.now();
@@ -1396,7 +1438,7 @@ function falsify() {
     // FLIGHTFIX7: a wrong-way LAND (09) against AI on 27
     ['no departure into a reciprocal lander (release + cancel)', 'js/atc/index.js', ['&& !traffic && oppositeRem(end, first) > T.oppositeBlock;', "|| (oppositeRem(end, id) < T.oppositeBlock * 0.6 ? 'opposite' : null);"], ['&& !traffic;', ';'], 'headon', 'LAND onto the reciprocal'],
     ['AIRLINERS: a fast departure waits for a slow one', 'js/atc/index.js', "else if (D[id].s?.intent === 'depart' && fastBehind(s, D[id].s) && ", 'else if (false && ', 'airliners', 'airliners: an A320 is cleared'],
-    ['AIRLINERS: no spacing go-around far out on a long final', 'js/atc/rules.js', 'spacingGaDist: { dash8: 2500, a320: 2500 },', 'spacingGaDist: {},', 'airliners', 'airliners: no spacing go-around'],
+    ['AIRLINERS/FLIGHTFIX8: no spacing go-around far out on a long final', 'js/atc/rules.js', 'spacingGaDist: { dash8: 2500, a320: 2500, jumbo: 2500, herc: 2500, f35: 2500, bizjet: 2500 },', 'spacingGaDist: { dash8: 2500, a320: 2500 },', 'airliners', 'airliners: no spacing go-around'],
     ['AI landers yield to a reciprocal lander', 'js/atc/index.js', "|| (opp < Math.min(T.oppositeBlock, (s.rem ?? 1e9) + 3000) ? 'opposite' : null);", ';', 'headon', 'LAND onto the reciprocal'],
   ];
   const files = ['js/atc/index.js', 'js/atc/geometry.js', 'js/atc/rules.js', 'js/atc/outrage.js', 'js/atc/bridge.js', 'js/world/layout.js', 'js/flight/routes.js', 'data/aircraft.js', 'data/rules.js', ...fs.readdirSync(path.join(ROOT, 'data/airports')).map((f) => `data/airports/${f}`)];

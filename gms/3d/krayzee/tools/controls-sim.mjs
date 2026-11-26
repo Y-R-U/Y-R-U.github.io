@@ -4,7 +4,7 @@
 //   node tools/controls-sim.mjs --falsify=<fault>   break one thing on purpose; the matching checks must go red:
 //      wait (the player's countdown back to 1.5 s) · attHold (the countdown levels the wings, the old 1.5 s hold) · urgent (old
 //      150 m rule skips the countdown) · nosafety (no upset skip at all) · bank60 (the old 60° bank rescue) · off (AUTO OFF never holds) · cmd (LAND does not end AUTO OFF) · roll (instructor
-//      rolls the wrong way) · level (instructor never levels the wings on the aim)
+//      rolls the wrong way) · level (instructor never levels the wings on the aim) · waitRecover (FLIGHTFIX8: a mid-countdown upset takes back silently)
 import { pathToFileURL } from 'node:url';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -124,6 +124,27 @@ const cruise = () => ({ x: 0, z: 3500, alt: 600, heading: 90, speed: 95 * KT, th
   step(V, 0.3);
   check('D37 countdown: let go diving at the ground (≥ 8 m/s sink low) → the AP recovers at once', auto(V)?.countdown == null && mode(V) !== 'MANUAL', `released ${agl0.toFixed(0)} m AGL sinking ${(-vs0).toFixed(1)} m/s → ${mode(V)} ${V.ap.phase}`);
   check('D37 countdown: let go banked past 70° → the AP recovers at once', auto(U)?.countdown == null && U.ap.phase === 'RECOVERY' || mode(U) !== 'MANUAL' && auto(U)?.countdown == null, `bank ${(U.ac.bank * 57.3).toFixed(0)}° phase ${U.ap.phase} ${JSON.stringify(auto(U))}`);
+}
+// ---- 3b. FLIGHTFIX8 (loop f35-medium "AP took back after 4.1 s, countdown skipped with no upset"): let go at 60° bank
+// sinking 10–12 m/s from ~320 m: no upset yet, so the countdown runs; the held turn sinks on toward the ground, and that
+// upset ends the countdown early. It must say so: a 'recovery' event (the RECOVERING flash), never a silent take-back.
+{
+  const S = player({ x: 0, z: 3500, alt: 330, heading: 90, speed: 180 * KT, throttle: 0.6 }, '09', 'f35');
+  if (FALSIFY === 'waitRecover') (await imp('js/flight/traffic.js')).FALSIFY_TR.waitRecover = true;
+  for (let t = 0; t < 8 && (S.ac.bank < 58 / 57.3 || S.ac.vs > -10); t += H) { S.p.manual.aileron = Math.max(-0.3, Math.min(0.3, (60 - S.ac.bank * 57.3) / 40)); S.p.manual.elevator = S.ac.vs > -11 ? -0.25 : 0; S.tr.update(H); }
+  S.p.manual.aileron = S.p.manual.elevator = null;
+  const rel = { bank: S.ac.bank * 57.3, vs: S.ac.vs, agl: S.ac.agl };
+  S.ap.events.length = 0;
+  step(S, 0.2);
+  const counting = auto(S)?.countdown != null;
+  let back = null, rec = false;
+  for (let t = 0.2; t < 11 && back == null; t += H) {
+    S.tr.update(H);
+    if (S.ap.events.some((e) => e.type === 'recovery')) rec = true;
+    if (mode(S) === 'AUTOPILOT') back = t;
+  }
+  check('FLIGHTFIX8: let go at 60° sinking from ~320 m in an F-35: the countdown starts, and if the sink ends it early the AP says RECOVERING', counting && back != null && (back > 9.5 || rec),
+    `release ${rel.bank.toFixed(0)}° ${rel.vs.toFixed(1)} m/s ${rel.agl.toFixed(0)} m AGL; counting ${counting}; AP back after ${back?.toFixed(1)} s; recovery event ${rec}`);
 }
 // ---- 4. AUTO OFF: the plane stays the player's, no countdown, for a minute; AUTO on again → AP
 {

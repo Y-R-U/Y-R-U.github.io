@@ -139,7 +139,7 @@ async function step(name, budgetSim, fn, { needs = true, blocks = needs } = {}) 
   if (M.gone && !M.goneReported) { M.goneReported = true; rec.ok = false; rec.detail += ` | the player's AP reached a despawn leg (GONE) ${JSON.stringify(M.gone)}`; }
   if (rec.ok && budgetSim && rec.simS > budgetSim * 1.0001) { rec.ok = false; rec.detail += ` | over budget ${rec.simS}s > ${budgetSim}s sim`; }
   if (!rec.ok) {
-    if (/crash|collision|bumped/.test(rec.detail)) { rec.contacts = await D.evSafe('window.__loopContacts', null); if (rec.contacts?.length) log(`    contacts: ${JSON.stringify(rec.contacts.slice(-3))}`); }
+    if (/crash|collision|bumped|stopped for/.test(rec.detail)) { rec.contacts = await D.evSafe('window.__loopContacts', null); if (rec.contacts?.length) log(`    contacts: ${JSON.stringify(rec.contacts.slice(-3))}`); }
     try { rec.shot = await D.shot(OUT, `${CASE.id}-${name}`.replace(/[^\w.-]+/g, '_')); } catch (e) { /* */ }
     rec.log = await D.evSafe(`__game.log().slice(-${LOG_TAIL}).map((l) => JSON.stringify(l).slice(0, 160))`, []);
     if (blocks) CASE.blocked ||= name;
@@ -369,12 +369,13 @@ async function runCase([plane, diff, orient]) {
       if (!countSeen) { const r = await D.rect('.krz-autobtn'); if (r?.state === 'count') countSeen = r.txt; }
       return s.p && s.p.apMode === 'AUTOPILOT' && Object.values(s.p.modes).every((m) => m === 'auto' || m === 'latched');
     }, B.apBack, { label: 'AP takes back (after the AUTO countdown)' });
-    if (!recovery && !countSeen) recovery = !!(await D.evSafe(`__game.log().some((l) => l.t >= ${rt1} && l.type === 'ap.recovery')`, false));
+    // FLIGHTFIX8: also after a countdown was seen: an upset part-way through it ends the countdown as a recovery
+    if (!recovery) recovery = !!(await D.evSafe(`__game.log().some((l) => l.t >= ${rt1} && l.type === 'ap.recovery')`, false));
     rec.apBackSim = r1(back.simS); rec.autoCount = countSeen; rec.recovery = recovery; rec.releaseBank = r1(s1.p.bank);
     if (M.crashes) fail('crashed during the manual bit');
     // an upset skip must be a D37 upset: banked past 70°, or sinking fast (the stall / ground cases sink)
     rec.upset = upset && `bank ${r1(upset.bank)}°, ${upset.fpm} fpm, ${r1(upset.agl)} m AGL`;
-    if (recovery && !countSeen && !upset) fail(`the countdown was skipped as an upset, but the plane was never in one (release: bank ${r1(s1.p.bank)}°, ${s1.p.fpm} fpm)`);
+    if (recovery && (!countSeen || back.simS < B.apEarliest) && !upset) fail(`the countdown was skipped as an upset, but the plane was never in one (release: bank ${r1(s1.p.bank)}°, ${s1.p.fpm} fpm)`);
     if (!countSeen && !recovery) fail('the AUTO button never showed its countdown after the stick was let go');
     if (back.simS < B.apEarliest && !recovery) fail(`the AP took back after only ${r1(back.simS)} s sim: the D37 10 s AUTO countdown was skipped with no upset`);
     // the AP may be mid-turn on its circuit, so "recovered" = back inside a normal AP bank and not sinking hard. That bank is
